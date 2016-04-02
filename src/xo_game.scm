@@ -103,9 +103,9 @@
          (if (eq? (car state1) (car goal))
              (+ (+ count 1) 
                 (match (cdr state1) (cdr goal) (+ count 1)))
-             (match (cdr state1) (cdr goal) 0)))   
+             (match (cdr state1) (cdr goal) count)))   
         (else
-         (match (cdr state1) (cdr goal) 0))))
+         (match (cdr state1) (cdr goal) count))))
 
 ;; return #t/#f
 (define (match? state goalstate)
