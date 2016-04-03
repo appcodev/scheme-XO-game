@@ -12,7 +12,29 @@
   
   ;; Heuristic
   (define (Heuristic state goalstate)
-    (match state goalstate 0))
+    (match state goalstate))
+  
+  ;; match?
+  ;; return #t/#f
+  (define (match? state goalstate)
+    (= (match state goalstate) 3))
+  
+  ;; count number of match
+  (define (match c_state c_goal)
+    ;; recursive match function
+    (define (match-loop state1 goal count)
+      (cond ((null? state1) count)
+            ((eq? (car state1) available)
+             (match-loop (cdr state1) (cdr goal) count))
+            ((not (eq? (car goal) available))
+             (if (eq? (car state1) (car goal)) 
+                 (match-loop (cdr state1) (cdr goal) (+ count 1))
+                 ;; if has some opponent in goal return 0 score
+                 0))   
+            (else
+             (match-loop (cdr state1) (cdr goal) count))))
+  ;;body  
+  (match-loop c_state c_goal 0))
   
   ;; Searching by A*
   ;; Algorthm A Implementation
@@ -20,7 +42,7 @@
     
     (define (a-paths paths)
       (cond ((null? paths) #f)
-            ((< (match (cadar paths) goalState 0) 0) #f)
+            ((<= (match (cadar paths) goalState) 0) #f)
             
             ((match? (cadar paths) goalState) (car paths))
             (else (a-paths (sort better-path
@@ -56,25 +78,18 @@
         (< (car lst1)
            (car lst2)))
       
-      (display "--- ")
       (display all-paths)
-      
       (if (not (null? all-paths))
           ;; return the best path ...
           (cadr (reverse (car (sort better all-paths))))
-          ;; if no-way to win choose one from state space
-          )
+          ;; player surrender from this game
+          '())
       ))
-  
-  ;;> (require "xo-beginner.ss")
-  ;;> (find-next-way '(O - - X O - X O -))
-  ;;> (find-next-way '(- - - - O - X O -))
   
   (define (all-possible-paths state goals)
     (cond ((null? goals) '())
           (else
            (let ((path (a-tree state (car goals))))
-             (display path)
              (if path
                  (cons path 
                        (all-possible-paths state (cdr goals)))
@@ -86,7 +101,8 @@
   ;; provide (export functions)
   (provide whos-next)
   (provide find-next-way)
-  (provide win?)
-  
+  (provide match)
+  (provide match?)
+  (provide GET-GOALSTATES)
   
   )

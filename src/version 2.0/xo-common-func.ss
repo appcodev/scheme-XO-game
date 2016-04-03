@@ -112,43 +112,15 @@
   
   ;; ---------------- End Goal State -----------------------
   
-  ;; count number of match
-  (define (match state1 goal count)
-    (cond ((null? state1) count)
-          ((eq? (car state1) available)
-           (match (cdr state1) (cdr goal) count))
-          ((not (eq? (car goal) available))
-           (if (eq? (car state1) (car goal)) 
-               (match (cdr state1) (cdr goal) (+ count 1))
-               (match (cdr state1) (cdr goal) (- count 5))))   
-          (else
-           (match (cdr state1) (cdr goal) count))))
   
-  ;; return #t/#f
-  (define (match? state goalstate)
-    (= (match state goalstate 0) 3))
   
-  ;; win? 
-  ;; this function used to check current player is the winner or not
-  (define (win? path player)
-    (let ((goals (GET-GOALSTATES player)))
-      ;; define private function
-      (define (check-to-win all-goals)
-        (cond ((null? all-goals) #f)
-              ((and (number? path)(= path 0)) #f)
-              ((match? path (car all-goals)) #t)
-              (else
-               (check-to-win (cdr all-goals)))))
-      
-      ;; body
-      (check-to-win goals)))
+  
+  
+  
   
   ;; provide
   (provide available)
   (provide whos-next)
-  (provide match)
-  (provide match?)
-  (provide win?)
   (provide GET-GOALSTATES)
   (provide GET-MOVES)
   

@@ -37,8 +37,14 @@
     (display path)
     (newline)
     (display-table path)
+    
     ;; check player is the winner ?
-    (cond ((win? path player)
+    (cond ((null? path)
+           (begin
+             (display "Player ")
+             (display player)
+             (display " surrendered.")))
+          ((win? path player)
            (begin
              (display "!!!!! Player ")
              (display player)
@@ -67,3 +73,19 @@
            (display " ")
            (display (car path))
            (display-table (cdr path))))))
+
+;; win? 
+;; this function used to check current player is the winner or not
+(define (win? path player)
+  (let ((goals (GET-GOALSTATES player)))
+    ;; define private function
+    (define (check-to-win all-goals)
+      (cond ((null? path) #f)
+            ((null? all-goals) #f)
+            ((and (number? path)(= path 0)) #f)
+            ((match? path (car all-goals)) #t)
+            (else
+             (check-to-win (cdr all-goals)))))
+    
+    ;; body
+    (check-to-win goals)))
