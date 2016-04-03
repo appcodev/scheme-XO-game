@@ -6,7 +6,8 @@
 ;;  - xo_basic.scm contains AI algorithm version 1.0
 
 ;; AI algorithms
-(require "xo-beginner.ss")
+;; (require "xo-beginner.ss")
+(require "xo-advance.ss")
 
 ;; Simulation game play
 ;; example:

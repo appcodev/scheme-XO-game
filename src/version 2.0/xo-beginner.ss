@@ -78,7 +78,6 @@
         (< (car lst1)
            (car lst2)))
       
-      (display all-paths)
       (if (not (null? all-paths))
           ;; return the best path ...
           (cadr (reverse (car (sort better all-paths))))
