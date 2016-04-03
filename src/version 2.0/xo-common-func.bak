@@ -1,0 +1,15 @@
+;; XO common functions
+;; - GET-MOVES
+;; - Goal-States
+
+(module xo-common mzscheme
+  ;; require
+  
+  
+  ;; functions
+  
+  
+  ;; provide
+  
+  
+  )

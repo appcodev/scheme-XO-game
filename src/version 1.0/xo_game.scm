@@ -1,9 +1,9 @@
 ;; XO game
-;; version 1.0
-;; find path to win
 
-(require (lib "list.ss"))
-(require (lib "compat.ss"))
+;; version 1.0
+;;  find path to win
+(require (lib "list.ss")
+         (lib "compat.ss"))
 
 ;; define state
 ;; (- - - - - - - - -)  -->  empty board
@@ -193,18 +193,21 @@
     (newline)
     (display-table path)
     ;; check player is the winner ?
-    (if (win? path player)
-        (begin
-          (display "!!!!! Player ")
-          (display player)
-          (display " is the WINNER !!!!!")
-          )
-        (display "play next round .."))
+    (cond ((win? path player)
+           (begin
+             (display "!!!!! Player ")
+             (display player)
+             (display " is the WINNER !!!!!")))
+          ((and (number? path) (= path 0)) 
+           (display "..."))
+          (else 
+           (display "play next round ..")))
     (newline)))
 
 ;; table simulation
 (define (display-table path)
   (cond ((null? path) (display ""))
+        ((and (number? path)(= path 0)) (display ""))
         ((= (modulo (length path) 3) 1)
          (begin 
            (display " ")
@@ -224,6 +227,7 @@
     ;; define private function
     (define (check-to-win all-goals)
       (cond ((null? all-goals) #f)
+            ((and (number? path)(= path 0)) #f)
             ((match? path (car all-goals)) #t)
             (else
              (check-to-win (cdr all-goals)))))
