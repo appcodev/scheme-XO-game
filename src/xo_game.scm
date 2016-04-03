@@ -1,4 +1,7 @@
 ;; XO game
+;; version 1.0
+;; find path to win
+
 (require (lib "list.ss"))
 (require (lib "compat.ss"))
 
@@ -19,18 +22,24 @@
 ;; state space :: Get-MOVES
 ;; define avaible is '- to check the available space 
 (define available '-)
+(define P1 'O)
+(define P2 'X)
 
-;; --- GET-MOVES
+;; function whos-next
+;; find next player with begin by st player
 
 ;; simple decision put X or O
 ;; 9 - (number of -)
 ;; if odd then put 'who second  => 'X
 ;; otherwise   put 'who first   => 'O
 
-(define (GET-MOVES state)
+;; input parameters
+;;   state is current state
+;;   st is first player
+;;   nd is second player
+(define (whos-next state)
   (if (= (modulo (num-space state) 2) 1)
-      (get-moves state 'O)
-      (get-moves state 'X)))
+      P1 P2))
 
 (define (num-space state)
   (cond ((null? state) 0)
@@ -38,6 +47,10 @@
          (+ 1 (num-space (cdr state)))) 
         (else 
          (num-space (cdr state)))))
+
+;; ------------------- GET-MOVES ------------------------
+(define (GET-MOVES state)
+  (get-moves state (whos-next state)))
 
 (define (get-moves state x)
   (define (moves-path index)
@@ -60,7 +73,7 @@
          (cons (car lst)
                (replace (cdr lst) (- index 1) x)))))
 
-;; ------ End GET-MOVES
+;; ------------------ End GET-MOVES ----------------------
 
 ;; define Goal States
 ;; (X X X - - - - - -)  ;; horizontal
@@ -98,18 +111,19 @@
 
 ;; count number of match
 (define (match state1 goal count)
-  (cond ((null? state1) 0)
-        ((not (eq? (car state1) available))
-         (if (eq? (car state1) (car goal))
-             (+ (+ count 1) 
-                (match (cdr state1) (cdr goal) (+ count 1)))
-             (match (cdr state1) (cdr goal) count)))   
+  (cond ((null? state1) count)
+        ((eq? (car state1) available)
+         (match (cdr state1) (cdr goal) count))
+        ((not (eq? (car goal) available))
+         (if (eq? (car state1) (car goal)) 
+             (match (cdr state1) (cdr goal) (+ count 1))
+             (match (cdr state1) (cdr goal) (- count 5))))   
         (else
          (match (cdr state1) (cdr goal) count))))
 
 ;; return #t/#f
 (define (match? state goalstate)
-  (= (match state goalstate 0) 6))
+  (= (match state goalstate 0) 3))
 
 
 ;; Searching by A*
@@ -118,6 +132,8 @@
 
   (define (a-paths paths)
     (cond ((null? paths) #f)
+          ((< (match (cadar paths) goalState 0) 0) #f)
+          
           ((match? (cadar paths) goalState) (car paths))
           (else (a-paths (sort better-path
                                (append (cdr paths)
@@ -137,3 +153,80 @@
   
   (a-paths (list (list 0 startState))))
 
+
+;; -- find next path
+(define (find-next-way current-state)
+  (let*
+      ;; local variables
+      ((player (whos-next current-state))
+       (goals (Get-GoalStates player))
+       (all-paths (all-possible-paths current-state goals)))
+    ;; body
+    ;; sort operator
+    (define (better lst1 lst2)
+      (< (car lst1)
+         (car lst2)))
+    (if (not (null? all-paths))
+        ;; return the best path ...
+        (cadr (reverse (car (sort better all-paths)))))
+    ))
+
+(define (all-possible-paths state goals)
+  (cond ((null? goals) '())
+        (else
+         (let ((path (a-tree state (car goals))))
+           (if path
+               (cons path (all-possible-paths state (cdr goals)))
+               (all-possible-paths state (cdr goals)))
+           ))))
+
+;; Game play
+(define (play state)
+  (let* ((player (whos-next state))
+         (path (find-next-way state)))
+    
+    ;; body
+    (display "Player ")
+    (display player)
+    (display " play -> ")
+    (display path)
+    (newline)
+    (display-table path)
+    ;; check player is the winner ?
+    (if (win? path player)
+        (begin
+          (display "!!!!! Player ")
+          (display player)
+          (display " is the WINNER !!!!!")
+          )
+        (display "play next round .."))
+    (newline)))
+
+;; table simulation
+(define (display-table path)
+  (cond ((null? path) (display ""))
+        ((= (modulo (length path) 3) 1)
+         (begin 
+           (display " ")
+           (display (car path))
+           (newline)
+           (display-table (cdr path))))
+        (else
+         (begin
+           (display " ")
+           (display (car path))
+           (display-table (cdr path))))))
+
+;; win? 
+;; this function used to check current player is the winner or not
+(define (win? path player)
+  (let ((goals (Get-GoalStates player)))
+    ;; define private function
+    (define (check-to-win all-goals)
+      (cond ((null? all-goals) #f)
+            ((match? path (car all-goals)) #t)
+            (else
+             (check-to-win (cdr all-goals)))))
+    
+    ;; body
+    (check-to-win goals)))
