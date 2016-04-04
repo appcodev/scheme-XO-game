@@ -59,22 +59,6 @@
            (display "play next round ..")))
     (newline)))
 
-;; table simulation
-(define (display-table path)
-  (cond ((null? path) (display ""))
-        ((and (number? path)(= path 0)) (display ""))
-        ((= (modulo (length path) 3) 1)
-         (begin 
-           (display " ")
-           (display (car path))
-           (newline)
-           (display-table (cdr path))))
-        (else
-         (begin
-           (display " ")
-           (display (car path))
-           (display-table (cdr path))))))
-
 ;; win? 
 ;; this function used to check current player is the winner or not
 (define (win? path player)

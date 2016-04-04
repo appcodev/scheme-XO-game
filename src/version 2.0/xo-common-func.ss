@@ -13,6 +13,10 @@
   (define P1 'O)
   (define P2 'X)
   
+  ;; Get opponent
+  (define (opponent player)
+    (if (eq? player P1) P2 P1))
+  
   ;; define Goal States
   ;; (X X X - - - - - -)  ;; horizontal
   ;; (- - - X X X - - -)  ;; horizontal
@@ -113,14 +117,30 @@
   ;; ---------------- End Goal State -----------------------
   
   
-  
-  
-  
-  
+  ;; --- Display
+  ;; table simulation
+  (define (display-table path)
+    (cond ((null? path) (display ""))
+          ((and (number? path)(= path 0)) (display ""))
+          ((= (modulo (length path) 3) 1)
+           (begin 
+             (display " ")
+             (display (car path))
+             (newline)
+             (display-table (cdr path))))
+          (else
+           (begin
+             (display " ")
+             (display (car path))
+             (display-table (cdr path))))))
   
   ;; provide
   (provide available)
+  (provide opponent)
   (provide whos-next)
+  (provide get-moves)
+  (provide replace)
+  (provide display-table)
   (provide GET-GOALSTATES)
   (provide GET-MOVES)
   
