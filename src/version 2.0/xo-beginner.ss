@@ -29,8 +29,8 @@
             ((not (eq? (car goal) available))
              (if (eq? (car state1) (car goal)) 
                  (match-loop (cdr state1) (cdr goal) (+ count 1))
-                 ;; if has some opponent in goal return 0 score
-                 0))   
+                 ;; if has some opponent in goal return -1 score
+                 -1))   
             (else
              (match-loop (cdr state1) (cdr goal) count))))
   ;;body  
@@ -42,7 +42,8 @@
     
     (define (a-paths paths)
       (cond ((null? paths) #f)
-            ((<= (match (cadar paths) goalState) 0) #f)
+            ((and (> (length paths) 1)
+                  (< (match (cadar paths) goalState) 0)) #f)
             
             ((match? (cadar paths) goalState) (car paths))
             (else (a-paths (sort better-path
@@ -103,5 +104,8 @@
   (provide match)
   (provide match?)
   (provide GET-GOALSTATES)
+  
+   ;; for display
+  (provide display-table)
   
   )

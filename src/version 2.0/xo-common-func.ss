@@ -55,11 +55,12 @@
   
   ;; input parameters
   ;;   state is current state
-  ;;   st is first player
-  ;;   nd is second player
+  ;;   if return #f for anyone can't play game continous, draw is result
   (define (whos-next state)
-    (if (= (modulo (num-space state) 2) 1)
-        P1 P2))
+    (let ((sp (num-space state)))
+      (cond ((= sp 0) #f)
+            ((= (modulo sp 2) 1) P1)
+            (else P2))))
   
   (define (num-space state)
     (cond ((null? state) 0)
@@ -137,11 +138,13 @@
   ;; provide
   (provide available)
   (provide opponent)
+  (provide num-space)
   (provide whos-next)
   (provide get-moves)
   (provide replace)
-  (provide display-table)
   (provide GET-GOALSTATES)
   (provide GET-MOVES)
   
+  ;; display
+  (provide display-table)
   )

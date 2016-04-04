@@ -98,10 +98,14 @@
                   (else
                    best-path))
             )
-          ;; [else] player surrender from this game or defend
+          ;; [else] 
+          ;; if all-paths is null = no way for win
+          ;; player choose defend or random walk
           (if (>= op-cindex 0)
+              ;; defend
               (replace current-state op-cindex player)
-              '()))
+              ;; random walk? choose first path*
+              (caar (GET-MOVES current-state)) ))
       ))
   
   (define (all-possible-paths state goals)
